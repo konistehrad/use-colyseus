@@ -15,13 +15,18 @@ export const colyseus = <S = Schema>(
 
   let connecting = false;
 
-  const connectToColyseus = async (roomName: string, options = {}) => {
+  const connectToColyseus = async (roomName: string, roomId: string = "", options = {}) => {
     if (connecting || roomStore.get()) return;
 
     connecting = true;
 
     try {
-      const room = await client.joinOrCreate<S>(roomName, options, schema);
+      var room;
+      if(!roomId) {
+        room = await client.joinOrCreate<S>(roomName, options, schema);
+      } else {
+        room = await client.joinById<S>(roomId, options, schema);
+      }
 
       roomStore.set(room);
       stateStore.set(room.state);
